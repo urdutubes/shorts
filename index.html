@@ -896,42 +896,51 @@ window._openM=function(v){ openModal(v); };
    SHEET LOADER — multiple proxies
 ════════════════════════════════ */
 async function loadSheet(){
-  const proxies=[
-    "https://corsproxy.io/?" + encodeURIComponent(SHEET_CSV),
-    "https://api.allorigins.win/raw?url=" + encodeURIComponent(SHEET_CSV),
-  ];
+  // Use Google Sheets JSON API — no proxy needed!
+  const SHEET_ID = "1tj3xg0toFl8vT_O0SFQY2inq6XZqKRSqPMGlgcbLXMI";
+  const GID      = "102941964";
+  const JSON_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-  function parseCSV(text){
-    const rows=text.trim().split("\n").map(r=>{
-      const cols=[]; let cur="",inQ=false;
-      for(let ch of r){
-        if(ch==='"'){inQ=!inQ;}
-        else if(ch===','&&!inQ){cols.push(cur.trim());cur="";}
-        else{cur+=ch;}
-      }
-      cols.push(cur.trim());
-      return cols;
-    });
-    rows.shift();
-    return rows.filter(r=>r[0]&&r[0].length>1).map(r=>({
-      id:       r[0]||"",
-      platform: (r[1]||"youtube").toLowerCase().trim(),
-      title:    r[2]||"Untitled",
-      category: r[3]||"General"
-    }));
+  try {
+    const res  = await fetch(JSON_URL);
+    const text = await res.text();
+    // Google wraps response in: google.visualization.Query.setResponse({...})
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?$/)[1]);
+    const rows = json.table.rows;
+    return rows
+      .filter(r => r.c[0] && r.c[0].v)
+      .map(r => ({
+        id:       String(r.c[0].v).trim(),
+        platform: String(r.c[1]?.v || "youtube").toLowerCase().trim(),
+        title:    String(r.c[2]?.v || "Untitled").trim(),
+        category: String(r.c[3]?.v || "General").trim(),
+      }));
+  } catch(e) {
+    console.warn("JSON API failed, trying CSV proxy...", e);
+    // Fallback to proxy
+    try {
+      const proxy = "https://corsproxy.io/?" + encodeURIComponent(SHEET_CSV);
+      const res   = await fetch(proxy, {cache:"no-cache"});
+      const text  = await res.text();
+      const rows  = text.trim().split("\n").map(r=>{
+        const cols=[]; let cur="",inQ=false;
+        for(let ch of r){
+          if(ch==='"'){inQ=!inQ;}
+          else if(ch===','&&!inQ){cols.push(cur.trim());cur="";}
+          else{cur+=ch;}
+        }
+        cols.push(cur.trim());
+        return cols;
+      });
+      rows.shift();
+      return rows.filter(r=>r[0]&&r[0].length>1).map(r=>({
+        id:       r[0]||"",
+        platform: (r[1]||"youtube").toLowerCase().trim(),
+        title:    r[2]||"Untitled",
+        category: r[3]||"General"
+      }));
+    } catch(e2){ return []; }
   }
-
-  for(let url of proxies){
-    try{
-      const res=await fetch(url,{cache:"no-cache"});
-      const text=await res.text();
-      if(text&&text.length>10&&!text.includes("<html")){
-        const data=parseCSV(text);
-        if(data.length>0) return data;
-      }
-    }catch(e){ console.warn("Proxy failed:",url); }
-  }
-  return [];
 }
 
 /* ════════════════════════════════
