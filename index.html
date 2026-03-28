@@ -42,6 +42,55 @@
   --glass:   rgba(242,242,251,0.92);
 }
 
+/* ═══════════════════════════════════════
+   TOP SITE MENU
+═══════════════════════════════════════ */
+#sitemenu {
+  flex-shrink: 0;
+  background: #0d0d18;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+#sitemenu::-webkit-scrollbar { display: none; }
+
+.sm-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px;
+  min-width: 100%;
+}
+
+.sm-link {
+  display: inline-block;
+  padding: 7px 12px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+.sm-link:hover { color: #fff; background: rgba(255,255,255,0.07); }
+.sm-link.home {
+  color: var(--accent);
+  font-weight: 700;
+}
+.sm-link.home:hover { background: rgba(var(--accent-rgb),0.12); }
+
+.sm-divider {
+  width: 1px; height: 14px;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+[data-theme="light"] #sitemenu { background: #1a1a2e; }
+
 html, body {
   height: 100%; width: 100%;
   overflow: hidden;
@@ -96,14 +145,9 @@ html, body {
 .back-btn span { font-size: 1rem; }
 
 .logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.3px;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .topbar-right {
@@ -539,12 +583,46 @@ html, body {
 
 <div id="app">
 
+  <!-- Site Menu -->
+  <div id="sitemenu">
+    <div class="sm-inner">
+      <a class="sm-link home" href="https://www.urdutubes.com" target="_blank">🏠 Home</a>
+      <div class="sm-divider"></div>
+      <a class="sm-link" href="https://www.urdutubes.com/p/subcat_12.html?subcat=islamic-movies-in-urdu" target="_blank">Islamic Movies</a>
+      <div class="sm-divider"></div>
+      <a class="sm-link" href="https://www.urdutubes.com/p/archive.html" target="_blank">Archive</a>
+      <div class="sm-divider"></div>
+      <a class="sm-link" href="https://www.urdutubes.com/p/latest-jobs.html" target="_blank">Latest Jobs</a>
+      <div class="sm-divider"></div>
+      <a class="sm-link" href="#" target="_blank">Link 5</a>
+      <div class="sm-divider"></div>
+      <a class="sm-link" href="#" target="_blank">Link 6</a>
+    </div>
+  </div>
+
   <!-- Top Bar -->
   <div id="topbar">
     <a class="back-btn" href="https://www.urdutubes.com" id="backBtn">
       <span>←</span> Back
     </a>
-    <div class="logo">⚡ UT Shorts</div>
+    <div class="logo">
+      <svg width="140" height="36" viewBox="0 0 280 72" xmlns="http://www.w3.org/2000/svg">
+        <rect width="280" height="72" rx="8" fill="#0a0a14"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(-40 258 36)"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(0 258 36)"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(40 258 36)"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(80 258 36)"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(120 258 36)"/>
+        <ellipse cx="258" cy="36" rx="16" ry="6" fill="none" stroke="#f7527a" stroke-width="1.4" transform="rotate(160 258 36)"/>
+        <ellipse cx="258" cy="36" rx="10" ry="4" fill="none" stroke="#f7527a" stroke-width="1.1" transform="rotate(20 258 36)"/>
+        <ellipse cx="258" cy="36" rx="10" ry="4" fill="none" stroke="#f7527a" stroke-width="1.1" transform="rotate(60 258 36)"/>
+        <ellipse cx="258" cy="36" rx="10" ry="4" fill="none" stroke="#f7527a" stroke-width="1.1" transform="rotate(100 258 36)"/>
+        <circle cx="258" cy="36" r="3" fill="#f7527a"/>
+        <polygon points="18,10 12,30 19,30 13,58 28,32 20,32 26,10" fill="#f7527a"/>
+        <text x="34" y="28" font-family="Impact,'Arial Black',sans-serif" font-size="22" font-weight="900" fill="#00c9a7" letter-spacing="1">URDU TUBE</text>
+        <text x="34" y="50" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#00c9a7" letter-spacing="3">&#9889; S H O R T S</text>
+      </svg>
+    </div>
     <div class="topbar-right">
       <div class="icon-btn" id="themeBtn" title="Toggle theme">🌙</div>
     </div>
@@ -591,7 +669,7 @@ html, body {
 ════════════════════════════════ */
 const SHEET_CSV  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcsxQ0Cx9Z0mJjC8zh-No0U7KeYRvX5D5BfTg2o-PrsNzb7I2CRYQD2bRP7BbPi_z4M9WRNgH5E8t0/pub?gid=102941964&single=true&output=csv";
 const HOME_URL   = "https://www.urdutubes.com";
-const CATEGORIES = ["All","Islamic","Books","Science","Education","General"];
+const CATEGORIES = ["All"]; // Will be populated dynamically from Sheet
 const L_NAMES    = { vertical:"Vertical Scroll", grid:"Grid View", swipe:"Card Swipe", cinema:"Cinema Mode", magazine:"Magazine" };
 
 /* ════════════════════════════════
@@ -637,13 +715,24 @@ $("backBtn").onclick = e => {
 /* ════════════════════════════════
    CATEGORIES
 ════════════════════════════════ */
-function renderCats(){
+function buildCatList(vids){
+  // Dynamically build categories from sheet data
+  const seen = new Set();
+  seen.add("All");
+  vids.forEach(v => { if(v.category) seen.add(v.category.trim()); });
+  return Array.from(seen);
+}
+
+function renderCats(vids){
   const bar = $("catbar"); bar.innerHTML="";
-  CATEGORIES.forEach(c=>{
+  const cats = vids && vids.length ? buildCatList(vids) : ["All"];
+  // Make sure current cat is valid
+  if(!cats.includes(cat)) cat = "All";
+  cats.forEach(c=>{
     const b=document.createElement("button");
     b.className="cat-pill"+(c===cat?" on":"");
     b.textContent=c;
-    b.onclick=()=>{ cat=c; cinIdx=0; swIdx=0; renderCats(); render(); };
+    b.onclick=()=>{ cat=c; cinIdx=0; swIdx=0; renderCats(videos); render(); };
     bar.appendChild(b);
   });
 }
@@ -658,6 +747,7 @@ $("lbtns").addEventListener("click", e=>{
   layout=b.dataset.l;
   $("lname").textContent=L_NAMES[layout];
   cinIdx=0; swIdx=0;
+  renderCats(videos);
   render();
 });
 
@@ -948,9 +1038,9 @@ async function loadSheet(){
 ════════════════════════════════ */
 async function init(){
   $("content").innerHTML=`<div class="state-box"><div class="spinner"></div><div class="state-text">Loading videos…</div></div>`;
-  renderCats();
+  renderCats([]);
   videos = await loadSheet();
-  renderCats();
+  renderCats(videos);
   render();
 }
 
