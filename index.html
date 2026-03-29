@@ -3,41 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shorts Player</title>
-
+<title>UT Shorts Player</title>
 <style>
-:root{
-  --accent:#7c6af7;
-}
-
-/* ===== RESET ===== */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
-  background:#020617;
-  font-family:system-ui;
-  overflow:hidden;
-}
+:root { --accent: #7c6af7; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#020617; font-family:system-ui; overflow:hidden; }
 
 /* ===== FEED ===== */
-.v-feed{
+.v-feed {
   height:100vh;
   overflow-y:auto;
   scroll-snap-type:y mandatory;
+  scrollbar-width:none;
 }
+.v-feed::-webkit-scrollbar { display:none; }
 
 /* ===== SLIDE ===== */
-.v-slide{
+.v-slide {
   height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
   scroll-snap-align:start;
   position:relative;
-  background:radial-gradient(circle at center, rgba(124,106,247,0.2), transparent 60%);
+  background:radial-gradient(circle at center, rgba(124,106,247,0.15), transparent 60%);
 }
 
-/* ===== PLAYER ===== */
-.v-wrap{
+/* ===== PLAYER WRAP ===== */
+.v-wrap {
   width:100%;
   max-width:420px;
   height:90vh;
@@ -45,145 +38,570 @@ body{
   overflow:hidden;
   background:#000;
   position:relative;
-
-  box-shadow:
-    0 0 80px rgba(124,106,247,.25),
-    0 20px 80px rgba(0,0,0,.8);
+  box-shadow: 0 0 80px rgba(124,106,247,.25), 0 20px 80px rgba(0,0,0,.8);
+  transition:transform 0.3s;
 }
+.v-wrap:hover { transform:scale(1.01); }
 
-/* DESKTOP BOOST */
-@media(min-width:768px){ .v-wrap{max-width:520px;} }
-@media(min-width:1024px){ .v-wrap{max-width:600px;} }
-@media(min-width:1400px){ .v-wrap{max-width:680px;} }
+@media(min-width:768px)  { .v-wrap{max-width:520px;} }
+@media(min-width:1024px) { .v-wrap{max-width:600px;} }
+@media(min-width:1400px) { .v-wrap{max-width:680px;} }
 
-/* ===== VIDEO ===== */
-.v-wrap iframe{
+/* ===== IFRAME ===== */
+.v-wrap iframe {
   width:100%;
   height:100%;
   border:0;
+  display:block;
+}
+
+/* ===== THUMBNAIL (shown before play) ===== */
+.v-thumb {
+  position:absolute;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:3;
+}
+.v-thumb img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.85;
+}
+.v-thumb-play {
+  position:absolute;
+  width:64px;
+  height:64px;
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(10px);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  border:2px solid rgba(255,255,255,0.4);
 }
 
 /* ===== META ===== */
-.v-meta{
+.v-meta {
   position:absolute;
-  bottom:20px;
-  left:20px;
-  color:#fff;
+  bottom:0;
+  left:0;
+  right:0;
+  padding:60px 16px 20px;
+  background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  z-index:2;
 }
-
-.v-title{
-  font-size:18px;
+.v-category {
+  font-size:11px;
+  font-weight:700;
+  color:var(--accent);
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.v-title {
+  font-size:16px;
   font-weight:600;
+  color:#fff;
+  line-height:1.4;
+}
+.v-desc {
+  font-size:12px;
+  color:rgba(255,255,255,0.6);
+  margin-top:4px;
+  line-height:1.4;
 }
 
 /* ===== ACTIONS ===== */
-.v-actions{
+.v-actions {
   position:absolute;
-  right:20px;
-  bottom:120px;
+  right:14px;
+  bottom:100px;
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:12px;
+  z-index:4;
 }
-
-.v-btn{
+.v-btn {
   width:44px;
   height:44px;
   border-radius:50%;
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.2);
   display:flex;
   align-items:center;
   justify-content:center;
   backdrop-filter:blur(10px);
   cursor:pointer;
+  font-size:20px;
+  color:#fff;
+  text-decoration:none;
+  transition:background 0.2s;
+}
+.v-btn:hover { background:rgba(255,255,255,0.25); }
+
+/* ===== PLATFORM BADGE ===== */
+.v-platform {
+  position:absolute;
+  top:14px;
+  left:14px;
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:6px;
+  z-index:4;
+  letter-spacing:0.4px;
+}
+.v-platform.youtube    { background:rgba(220,38,38,0.85); color:#fff; }
+.v-platform.dailymotion{ background:rgba(37,99,235,0.85);  color:#fff; }
+
+/* ===== NAV (top) ===== */
+.v-nav {
+  position:fixed;
+  top:0; left:0; right:0;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:100;
+  background:linear-gradient(to bottom, rgba(2,6,23,0.8), transparent);
+}
+.v-nav-logo {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+}
+.v-nav-icon {
+  width:30px; height:30px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px;
+}
+.v-nav-name { font-size:14px; font-weight:700; color:#fff; }
+.v-nav-back {
+  font-size:12px; color:rgba(255,255,255,0.7);
+  text-decoration:none; padding:6px 12px;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:20px;
+  backdrop-filter:blur(8px);
 }
 
-/* ===== HOVER ===== */
-.v-wrap:hover{
-  transform:scale(1.02);
-  transition:0.3s;
+/* ===== COUNTER ===== */
+.v-counter {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:12px;
+  color:rgba(255,255,255,0.4);
+  z-index:100;
+  pointer-events:none;
+}
+
+/* ===== LOADING ===== */
+.v-loading {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  gap:16px;
+}
+.v-spinner {
+  width:40px; height:40px;
+  border:3px solid rgba(124,106,247,0.2);
+  border-top-color:#7c6af7;
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* ===== ERROR ===== */
+.v-error {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  gap:12px;
+  text-align:center;
+  padding:20px;
+}
+.v-error-icon { font-size:40px; }
+.v-error-msg  { font-size:14px; color:rgba(255,255,255,0.6); }
+.v-retry {
+  margin-top:8px;
+  padding:8px 20px;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:13px;
 }
 </style>
 </head>
-
 <body>
 
+<!-- TOP NAV -->
+<nav class="v-nav">
+  <a class="v-nav-logo" href="https://www.urdutubes.com">
+    <div class="v-nav-icon">⚡</div>
+    <span class="v-nav-name">UT Shorts</span>
+  </a>
+  <a class="v-nav-back" href="https://www.urdutubes.com/p/shorts.html">← Browse</a>
+</nav>
+
+<!-- FEED -->
 <div class="v-feed" id="feed">
-
-  <!-- VIDEO 1 -->
-  <div class="v-slide">
-    <div class="v-wrap">
-      <iframe data-src="https://www.dailymotion.com/embed/video/x6gqkqq?autoplay=0&mute=1"></iframe>
-      <div class="v-meta">
-        <div class="v-title">Gulistan Palace Tehran</div>
-      </div>
-    </div>
+  <div class="v-loading" id="vLoading">
+    <div class="v-spinner"></div>
+    <div>Loading shorts…</div>
   </div>
-
-  <!-- VIDEO 2 -->
-  <div class="v-slide">
-    <div class="v-wrap">
-      <iframe data-src="https://www.dailymotion.com/embed/video/x7xxxxxx?autoplay=0&mute=1"></iframe>
-      <div class="v-meta">
-        <div class="v-title">Another Video</div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
+<!-- COUNTER -->
+<div class="v-counter" id="vCounter"></div>
+
 <script>
+(function(){
+'use strict';
 
-/* ===== AUTO PLAY CENTER ===== */
-const slides = document.querySelectorAll(".v-wrap");
+/* ══ CONFIG ══ */
+const SHEET_ID = "1tj3xg0toFl8vT_O0SFQY2inq6XZqKRSqPMGlgcbLXMI";
+const GID      = "102941964";
+const CACHE_KEY= "uta_cache_v2";
+const CACHE_TTL= 30 * 60 * 1000;
 
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    const iframe = entry.target.querySelector("iframe");
+const feed     = document.getElementById("feed");
+const loading  = document.getElementById("vLoading");
+const counter  = document.getElementById("vCounter");
 
-    if(entry.isIntersecting){
-      if(!iframe.src){
-        iframe.src = iframe.dataset.src.replace("autoplay=0","autoplay=1");
+/* ══ BUILD CORRECT EMBED URL ══ */
+function embedUrl(v) {
+  if (v.platform === "youtube") {
+    // YouTube: use video ID directly
+    return `https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+  } else {
+    // Dailymotion: use video ID directly
+    return `https://www.dailymotion.com/embed/video/${v.id}?autoplay=1&mute=0&queue-enable=false`;
+  }
+}
+
+function embedUrlPaused(v) {
+  if (v.platform === "youtube") {
+    return `https://www.youtube.com/embed/${v.id}?autoplay=0&rel=0&modestbranding=1&playsinline=1`;
+  } else {
+    return `https://www.dailymotion.com/embed/video/${v.id}?autoplay=0&queue-enable=false`;
+  }
+}
+
+/* ══ THUMBNAIL URL ══ */
+function thumbUrl(v) {
+  if (v.thumbnail) return v.thumbnail;
+  if (v.platform === "youtube") {
+    return `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+  }
+  return `https://www.dailymotion.com/thumbnail/video/${v.id}`;
+}
+
+/* ══ PLATFORM LABEL ══ */
+function platLabel(p) {
+  return p === "youtube" ? "▶ YouTube" : "◆ Dailymotion";
+}
+
+/* ══ BUILD SLIDE ══ */
+function buildSlide(v, idx, total) {
+  const slide = document.createElement("div");
+  slide.className = "v-slide";
+  slide.dataset.idx = idx;
+
+  const wrap = document.createElement("div");
+  wrap.className = "v-wrap";
+
+  // Platform badge
+  const badge = document.createElement("div");
+  badge.className = `v-platform ${v.platform}`;
+  badge.textContent = platLabel(v.platform);
+
+  // Iframe (lazy — no src yet)
+  const iframe = document.createElement("iframe");
+  iframe.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+  iframe.allowFullscreen = true;
+  iframe.dataset.src = embedUrl(v);
+  iframe.dataset.srcPaused = embedUrlPaused(v);
+
+  // Thumbnail overlay (click to play)
+  const thumb = document.createElement("div");
+  thumb.className = "v-thumb";
+  const tImg = document.createElement("img");
+  tImg.src = thumbUrl(v);
+  tImg.alt = v.title;
+  tImg.loading = "lazy";
+  const playBtn = document.createElement("div");
+  playBtn.className = "v-thumb-play";
+  playBtn.textContent = "▶";
+  thumb.appendChild(tImg);
+  thumb.appendChild(playBtn);
+
+  // Click thumb → load iframe and hide thumb
+  thumb.addEventListener("click", () => {
+    iframe.src = iframe.dataset.src;
+    thumb.style.display = "none";
+  });
+
+  // Meta
+  const meta = document.createElement("div");
+  meta.className = "v-meta";
+  meta.innerHTML = `
+    <div class="v-category">${v.category || ""}</div>
+    <div class="v-title">${v.title}</div>
+    ${v.description ? `<div class="v-desc">${v.description}</div>` : ""}
+  `;
+
+  // Actions
+  const actions = document.createElement("div");
+  actions.className = "v-actions";
+
+  // Share button
+  const shareBtn = document.createElement("div");
+  shareBtn.className = "v-btn";
+  shareBtn.title = "Share";
+  shareBtn.textContent = "↗";
+  shareBtn.onclick = () => {
+    const url = window.location.href.split("?")[0] + `?v=${v.id}&p=${v.platform}`;
+    if(navigator.share){
+      navigator.share({ title: v.title, url });
+    } else {
+      navigator.clipboard.writeText(url).then(()=>alert("Link copied!"));
+    }
+  };
+
+  // Open original
+  const openBtn = document.createElement("a");
+  openBtn.className = "v-btn";
+  openBtn.title = "Open original";
+  openBtn.textContent = "⎋";
+  openBtn.href = v.platform === "youtube"
+    ? `https://www.youtube.com/watch?v=${v.id}`
+    : `https://www.dailymotion.com/video/${v.id}`;
+  openBtn.target = "_blank";
+  openBtn.rel = "noopener";
+
+  actions.appendChild(shareBtn);
+  actions.appendChild(openBtn);
+
+  wrap.appendChild(badge);
+  wrap.appendChild(iframe);
+  wrap.appendChild(thumb);
+  wrap.appendChild(meta);
+  wrap.appendChild(actions);
+  slide.appendChild(wrap);
+  return { slide, iframe, thumb };
+}
+
+/* ══ SHUFFLE ══ */
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ══ RENDER FEED ══ */
+let slides = [];
+let currentIdx = 0;
+
+function renderFeed(vids) {
+  feed.innerHTML = "";
+  // Featured first, then shuffle rest
+  const featured = vids.filter(v => v.featured);
+  const rest = shuffle(vids.filter(v => !v.featured));
+  const ordered = [...featured, ...rest];
+
+  // Check URL params for direct video
+  const params = new URLSearchParams(window.location.search);
+  const targetId = params.get("v");
+  const targetPlat = params.get("p");
+  if (targetId) {
+    const ti = ordered.findIndex(v => v.id === targetId && (!targetPlat || v.platform === targetPlat));
+    if (ti > 0) {
+      const [found] = ordered.splice(ti, 1);
+      ordered.unshift(found);
+    }
+  }
+
+  slides = ordered.map((v, idx) => buildSlide(v, idx, ordered.length));
+  slides.forEach(({ slide }) => feed.appendChild(slide));
+
+  counter.textContent = `1 / ${slides.length}`;
+  setupObserver();
+  setupScroll();
+}
+
+/* ══ INTERSECTION OBSERVER — auto play/pause ══ */
+function setupObserver() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const slide = entry.target;
+      const idx = parseInt(slide.dataset.idx);
+      const { iframe, thumb } = slides[idx];
+
+      if (entry.isIntersecting) {
+        currentIdx = idx;
+        counter.textContent = `${idx + 1} / ${slides.length}`;
+
+        // Auto-load if thumb already hidden (user clicked) or auto-play first slide
+        if (thumb.style.display === "none") {
+          iframe.src = iframe.dataset.src;
+        } else if (idx === 0) {
+          // First slide: auto show
+          setTimeout(() => {
+            iframe.src = iframe.dataset.src;
+            thumb.style.display = "none";
+          }, 300);
+        }
+      } else {
+        // Pause: reset src to paused version
+        if (thumb.style.display === "none") {
+          iframe.src = iframe.dataset.srcPaused;
+        }
       }
-    }else{
-      iframe.src = iframe.dataset.src; // reset
+    });
+  }, { threshold: 0.75 });
+
+  slides.forEach(({ slide }) => obs.observe(slide));
+}
+
+/* ══ SMOOTH SCROLL ══ */
+function setupScroll() {
+  // Mouse wheel
+  feed.addEventListener("wheel", e => {
+    e.preventDefault();
+    feed.scrollBy({ top: e.deltaY > 0 ? window.innerHeight : -window.innerHeight, behavior: "smooth" });
+  }, { passive: false });
+
+  // Touch swipe
+  let startY = 0;
+  feed.addEventListener("touchstart", e => { startY = e.touches[0].clientY; }, { passive: true });
+  feed.addEventListener("touchend", e => {
+    const diff = startY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > 50) {
+      feed.scrollBy({ top: diff > 0 ? window.innerHeight : -window.innerHeight, behavior: "smooth" });
+    }
+  }, { passive: true });
+
+  // Keyboard arrows
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+      feed.scrollBy({ top: window.innerHeight, behavior: "smooth" });
+    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+      feed.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
     }
   });
-},{threshold:0.7});
+}
 
-slides.forEach(el=>observer.observe(el));
+/* ══ LOAD DATA ══ */
+async function loadSheet() {
+  // Check cache
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, ts } = JSON.parse(cached);
+      if (Date.now() - ts < CACHE_TTL && data.length > 0) return data;
+    }
+  } catch(e) {}
 
-/* ===== SMOOTH SCROLL ===== */
-const feed = document.getElementById("feed");
+  const BASE = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+  const URLS = [
+    BASE,
+    `https://corsproxy.io/?${encodeURIComponent(BASE)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(BASE)}`
+  ];
 
-feed.addEventListener("wheel", e=>{
-  e.preventDefault();
-  feed.scrollBy({
-    top: e.deltaY > 0 ? window.innerHeight : -window.innerHeight,
-    behavior:"smooth"
-  });
-},{passive:false});
-
-/* ===== TOUCH SWIPE ===== */
-let startY=0;
-
-feed.addEventListener("touchstart",e=>{
-  startY=e.touches[0].clientY;
-});
-
-feed.addEventListener("touchend",e=>{
-  let endY=e.changedTouches[0].clientY;
-  let diff=startY-endY;
-
-  if(Math.abs(diff)>50){
-    feed.scrollBy({
-      top: diff>0 ? window.innerHeight : -window.innerHeight,
-      behavior:"smooth"
-    });
+  function parse(text) {
+    try {
+      const m = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);?\s*$/);
+      if (!m) return null;
+      const json = JSON.parse(m[1]);
+      return json.table.rows
+        .filter(r => r.c[0] && r.c[0].v && String(r.c[0].v).trim() !== "video_id")
+        .map(r => ({
+          id:          String(r.c[0].v).trim(),
+          platform:    String(r.c[1]?.v || "youtube").toLowerCase().trim(),
+          title:       String(r.c[2]?.v || "Untitled").trim(),
+          category:    String(r.c[3]?.v || "General").trim(),
+          description: String(r.c[4]?.v || "").trim().slice(0, 120),
+          tags:        String(r.c[5]?.v || "").trim(),
+          thumbnail:   String(r.c[6]?.v || "").trim(),
+          featured:    String(r.c[7]?.v || "").toLowerCase().trim() === "yes",
+        }));
+    } catch(e) { return null; }
   }
-});
 
+  function fetchT(url, ms=8000) {
+    return Promise.race([
+      fetch(url, { cache: "no-cache" }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))
+    ]);
+  }
+
+  return new Promise(resolve => {
+    let done = false, pending = URLS.length;
+    URLS.forEach(url => {
+      fetchT(url)
+        .then(r => r.text())
+        .then(text => {
+          if (done) return;
+          if (text && text.length > 20 && !text.trim().startsWith("<!DOCTYPE")) {
+            const data = parse(text);
+            if (data && data.length > 0) {
+              done = true;
+              try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() })); } catch(e) {}
+              resolve(data);
+            }
+          }
+        })
+        .catch(() => {})
+        .finally(() => { pending--; if (pending === 0 && !done) resolve([]); });
+    });
+  });
+}
+
+/* ══ SHOW ERROR ══ */
+function showError() {
+  feed.innerHTML = `
+    <div class="v-error">
+      <div class="v-error-icon">📭</div>
+      <div style="font-size:16px;font-weight:600;color:#fff">Could not load videos</div>
+      <div class="v-error-msg">Check your connection and try again</div>
+      <button class="v-retry" onclick="location.reload()">Retry</button>
+    </div>`;
+}
+
+/* ══ INIT ══ */
+async function init() {
+  const vids = await loadSheet();
+  if (!vids || vids.length === 0) {
+    showError();
+    return;
+  }
+  renderFeed(vids);
+}
+
+init();
+})();
 </script>
-
 </body>
 </html>
