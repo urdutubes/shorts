@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT Shorts — Redirecting…</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+// GitHub Pages 404 trick — redirect clean URLs to index.html
+// /islamic/x6iz3jr → /?cat=islamic&v=x6iz3jr
+(function(){
+  var path  = window.location.pathname;
+  var parts = path.replace(/^\//, '').split('/').filter(Boolean);
+  // Only redirect if there are path segments (not a real missing file)
+  if(parts.length >= 1){
+    var query = '';
+    if(parts[0]) query += 'cat=' + encodeURIComponent(parts[0]);
+    if(parts[1]) query += '&v=' + encodeURIComponent(parts[1]);
+    var newUrl = '/' + (query ? '?' + query : '') + window.location.hash;
+    // Redirect after tiny delay so page renders briefly
+    setTimeout(function(){ window.location.replace(newUrl); }, 800);
+  }
+})();
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Poppins','Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#0d1b2a,#1b2838,#0f3460);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  position:relative;overflow:hidden;
+}
+body::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 40%,rgba(0,184,148,.15) 0%,transparent 50%),
+             radial-gradient(circle at 80% 60%,rgba(232,67,147,.12) 0%,transparent 50%);
+}
+
+.card{
+  position:relative;z-index:1;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  padding:36px 28px 28px;
+  text-align:center;
+  max-width:460px;
+  width:100%;
+}
+
+.logo{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+}
+.logo-icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,#00b894,#00cec9);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+  box-shadow:0 4px 16px rgba(0,184,148,.4);
+}
+.logo-text h2{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.logo-text p{font-size:.65rem;color:rgba(255,255,255,.5);letter-spacing:.5px;}
+
+.redirect-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,184,148,.15);border:1px solid rgba(0,184,148,.3);
+  border-radius:30px;padding:5px 14px;margin-bottom:18px;
+  font-size:.7rem;color:#00b894;font-weight:600;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#00b894;
+  animation:pulse 1s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+h1{font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3;}
+.sub{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:24px;line-height:1.5;}
+
+/* Quick links */
+.ql-title{font-size:.65rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px;}
+
+.ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+
+.ql-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border-radius:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  text-decoration:none;
+  transition:all .2s;cursor:pointer;
+  text-align:left;
+}
+.ql-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-2px);}
+
+.ql-icon{
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;
+}
+.ql-info{min-width:0;}
+.ql-name{font-size:.74rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ql-desc{font-size:.6rem;color:rgba(255,255,255,.4);margin-top:1px;}
+
+/* Home button */
+.home-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;border-radius:12px;
+  background:linear-gradient(135deg,#00b894,#00cec9);
+  color:#fff;font-size:.82rem;font-weight:700;
+  text-decoration:none;border:none;cursor:pointer;
+  transition:opacity .2s,transform .2s;
+  box-shadow:0 4px 16px rgba(0,184,148,.35);
+}
+.home-btn:hover{opacity:.9;transform:translateY(-2px);}
+
+.divider{height:1px;background:rgba(255,255,255,.08);margin:16px 0;}
+
+.footer-links{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
+.footer-links a{font-size:.68rem;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:#00b894;}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Logo -->
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h2>UT Shorts</h2>
+      <p>URDU TUBE — A HOME OF ENTERTAINMENT</p>
+    </div>
+  </div>
+
+  <!-- Redirect notice -->
+  <div class="redirect-badge">
+    <div class="dot"></div>
+    Redirecting to video…
+  </div>
+
+  <h1>Taking you to your video</h1>
+  <p class="sub">If you are not redirected automatically,<br>use the links below to navigate.</p>
+
+  <!-- Quick links -->
+  <div class="ql-title">Quick Links</div>
+
+  <div class="ql-grid">
+
+    <a class="ql-btn" href="https://shorts.urdutubes.com">
+      <div class="ql-icon" style="background:rgba(0,184,148,.2);">⚡</div>
+      <div class="ql-info">
+        <div class="ql-name">All Shorts</div>
+        <div class="ql-desc">All categories</div>
+      </div>
+    </a>
+
+    <a class="ql-btn" href="https://shorts.urdutubes.com/?cat=Islamic">
+      <div class="ql-icon" style="background:rgba(0,184,148,.2);">☪</div>
+      <div class="ql-info">
+        <div class="ql-name">Islamic</div>
+        <div class="ql-desc">Islamic videos</div>
+      </div>
+    </a>
+
+    <a class="ql-btn" href="https://shorts.urdutubes.com/?cat=Books">
+      <div class="ql-icon" style="background:rgba(108,92,231,.2);">📚</div>
+      <div class="ql-info">
+        <div class="ql-name">Books</div>
+        <div class="ql-desc">Book reviews</div>
+      </div>
+    </a>
+
+    <a class="ql-btn" href="https://shorts.urdutubes.com/?cat=Science">
+      <div class="ql-icon" style="background:rgba(9,132,227,.2);">🔬</div>
+      <div class="ql-info">
+        <div class="ql-name">Science</div>
+        <div class="ql-desc">Science videos</div>
+      </div>
+    </a>
+
+    <a class="ql-btn" href="https://shorts.urdutubes.com/?cat=Education">
+      <div class="ql-icon" style="background:rgba(225,112,85,.2);">🎓</div>
+      <div class="ql-info">
+        <div class="ql-name">Education</div>
+        <div class="ql-desc">Learn something new</div>
+      </div>
+    </a>
+
+    <a class="ql-btn" href="https://www.urdutubes.com/p/shorts.html">
+      <div class="ql-icon" style="background:rgba(232,67,147,.2);">🗂</div>
+      <div class="ql-info">
+        <div class="ql-name">Archive</div>
+        <div class="ql-desc">Browse all videos</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Home button -->
+  <a class="home-btn" href="https://www.urdutubes.com">
+    🏠 Go to Urdu Tube Home
+  </a>
+
+  <div class="divider"></div>
+
+  <!-- Footer links -->
+  <div class="footer-links">
+    <a href="https://www.urdutubes.com/p/subcat_12.html?subcat=islamic-movies-in-urdu">Islamic Movies</a>
+    <a href="https://www.urdutubes.com/p/archive.html">Archive</a>
+    <a href="https://www.urdutubes.com/p/latest-jobs.html">Latest Jobs</a>
+    <a href="https://www.urdutubes.com/p/about.html">About</a>
+    <a href="https://www.urdutubes.com/p/contact.html">Contact</a>
+  </div>
+
+</div>
+
+</body>
+</html>
