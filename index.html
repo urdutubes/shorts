@@ -687,13 +687,17 @@ let videos=[], cat="All", layout="vertical", cinIdx=0, swIdx=0;
    /islamic/x6iz3jr → cat=islamic, startId=x6iz3jr
 ════════════════════════════════ */
 function readURL(){
-  const path = window.location.pathname.replace(/^\//, "").split("/");
+  // Support both clean URLs (/islamic/videoId) and query params (?cat=islamic&v=videoId)
+  // The 404.html redirect converts clean URLs to query params
+  const path   = window.location.pathname.replace(/^\//, "").split("/").filter(Boolean);
   const params = new URLSearchParams(window.location.search);
   let urlCat = "", urlId = "";
-  if(path[0] && path[0] !== "index.html") urlCat = path[0];
-  if(path[1]) urlId = path[1];
-  if(params.get("cat")) urlCat = params.get("cat");
-  if(params.get("v"))   urlId  = params.get("v");
+  // Query params (from 404 redirect)
+  if(params.get("cat")) urlCat = decodeURIComponent(params.get("cat"));
+  if(params.get("v"))   urlId  = decodeURIComponent(params.get("v"));
+  // Direct path (if somehow arrives directly)
+  if(!urlCat && path[0] && path[0] !== "index.html") urlCat = path[0];
+  if(!urlId  && path[1]) urlId = path[1];
   return { urlCat, urlId };
 }
 
@@ -818,9 +822,10 @@ function renderVertical(c,vids){
   const f=document.createElement("div"); f.className="v-feed";
   vids.forEach((v,i)=>{
     const s=document.createElement("div"); s.className="v-slide";
+    // Use data-src instead of src — load iframe only when visible
     s.innerHTML=`
       <div class="v-wrap">
-        <iframe src="${embedUrl(v)}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen loading="lazy" title="${v.title}"></iframe>
+        <iframe data-src="${embedUrl(v)}" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen title="${v.title}"></iframe>
         <div class="v-info">
           <div class="v-tag">${v.category}</div>
           <div class="v-title">${v.title}</div>
@@ -839,6 +844,29 @@ function renderVertical(c,vids){
       ${i===0?`<div class="scroll-hint"><div class="hint-arrow">↓</div><span>Scroll</span></div>`:""}`;
     f.appendChild(s);
   });
+
+  // Intersection Observer — load iframe when slide is visible, unload when not
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const iframe = entry.target.querySelector("iframe");
+      if(!iframe) return;
+      if(entry.isIntersecting){
+        // Load this slide's iframe
+        if(iframe.dataset.src){
+          iframe.src = iframe.dataset.src;
+          delete iframe.dataset.src;
+        }
+      } else {
+        // Stop audio/video by removing src
+        if(!iframe.dataset.src){
+          iframe.dataset.src = iframe.src;
+          iframe.src = "about:blank";
+        }
+      }
+    });
+  }, { threshold: 0.6 });
+
+  f.querySelectorAll(".v-slide").forEach(s => observer.observe(s));
   c.appendChild(f);
 }
 
